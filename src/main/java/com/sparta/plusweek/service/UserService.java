@@ -44,7 +44,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void login(UserRequestDto userRequestDto, HttpServletResponse httpServletResponse) {
+    public void login(UserRequestDto userRequestDto) {
         String nickname = userRequestDto.getNickname();
         String password = userRequestDto.getPassword();
 
@@ -57,14 +57,9 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-
-        // JWT 생성 및 쿠키에 저장 후 Response 객체에 추가
-        String token = jwtUtil.createToken(user.getNickname());
-        jwtUtil.addJwtToCookie(token, httpServletResponse);
     }
 
     // 닉네임이 비밀번호에 포함되어 있는지 검증하는 메서드
-
     private boolean isPasswordContainsNickname(UserRequestDto userRequestDto) {
         return userRequestDto.getPassword().contains(userRequestDto.getNickname());
     }

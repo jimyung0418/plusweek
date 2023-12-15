@@ -2,6 +2,7 @@ package com.sparta.plusweek.controller;
 
 import com.sparta.plusweek.dto.CommonResponseDto;
 import com.sparta.plusweek.dto.UserRequestDto;
+import com.sparta.plusweek.jwt.JwtUtil;
 import com.sparta.plusweek.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
     public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserRequestDto userRequestDto) {
@@ -33,7 +35,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<CommonResponseDto> login(@RequestBody UserRequestDto userRequestDto, HttpServletResponse httpServletResponse) {
         try {
-            userService.login(userRequestDto, httpServletResponse);
+            userService.login(userRequestDto);
+            httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(userRequestDto.getNickname()));
             return ResponseEntity.ok().body(new CommonResponseDto("로그인 성공!", HttpStatus.OK.value()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(new CommonResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
