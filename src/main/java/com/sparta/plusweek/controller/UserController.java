@@ -25,7 +25,8 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
-    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserRequestDto userRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<CommonResponseDto> signup(@Valid @RequestBody UserRequestDto userRequestDto,
+                                                    BindingResult bindingResult) {
         // 유효성 검사 오류가 있는 경우
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
@@ -46,7 +47,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponseDto> login(@RequestBody UserRequestDto userRequestDto, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<CommonResponseDto> login(@RequestBody UserRequestDto userRequestDto,
+                                                   HttpServletResponse httpServletResponse) {
         try {
             userService.login(userRequestDto);
             httpServletResponse.addHeader(JwtUtil.AUTHORIZATION_HEADER,jwtUtil.createToken(userRequestDto.getNickname()));
