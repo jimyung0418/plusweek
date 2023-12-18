@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class PostResponseDto {
+public class PostResponseDto extends CommonResponseDto{
 
     private String title;
     private String nickname;

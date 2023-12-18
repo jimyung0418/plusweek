@@ -39,4 +39,10 @@ public class PostService {
         Post post = new Post(postRequestDto, userDetails);
         postRepository.save(post);
     }
+
+    public PostResponseDto getPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        return new PostResponseDto(post);
+    }
 }
