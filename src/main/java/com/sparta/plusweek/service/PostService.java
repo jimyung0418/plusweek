@@ -7,9 +7,11 @@ import com.sparta.plusweek.repository.PostRepository;
 import com.sparta.plusweek.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +46,18 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 없습니다."));
         return new PostResponseDto(post);
+    }
+
+    @Transactional
+    public void updatePost(Long postId, PostRequestDto postRequestDto, UserDetailsImpl userDetails) {
+        // 예외처리
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글이 없습니다."));
+
+        if (!Objects.equals(post.getUser().getUserId(), userDetails.getUser().getUserId())) {
+            throw new IllegalArgumentException("게시글 작성자만 수정 가능합니다.");
+        }
+
+        post.update(postRequestDto);
     }
 }
