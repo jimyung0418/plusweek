@@ -30,14 +30,13 @@ public class PostService {
     }
 
     public void createPost(PostRequestDto postRequestDto, UserDetailsImpl userDetails) {
-        // 예외 처리
+
         if (postRequestDto.getTitle() == null) {
             throw new IllegalArgumentException("제목을 입력하세요.");
         } else if (postRequestDto.getContent() == null) {
             throw new IllegalArgumentException("내용을 입력하세요.");
         }
 
-        // post 저장
         Post post = new Post(postRequestDto, userDetails);
         postRepository.save(post);
     }
@@ -50,14 +49,23 @@ public class PostService {
 
     @Transactional
     public void updatePost(Long postId, PostRequestDto postRequestDto, UserDetailsImpl userDetails) {
-        // 예외처리
+        Post post = checkPostAndUser(postId, userDetails);
+        post.update(postRequestDto);
+    }
+
+    public void deletePost(Long postId, UserDetailsImpl userDetails) {
+        Post post = checkPostAndUser(postId, userDetails);
+        postRepository.delete(post);
+    }
+
+    private Post checkPostAndUser(Long postId, UserDetailsImpl userDetails) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("해당 게시글이 없습니다."));
 
         if (!Objects.equals(post.getUser().getUserId(), userDetails.getUser().getUserId())) {
-            throw new IllegalArgumentException("게시글 작성자만 수정 가능합니다.");
+            throw new IllegalArgumentException("게시글 작성자만 수정 및 삭제 가능합니다.");
         }
 
-        post.update(postRequestDto);
+        return post;
     }
 }
