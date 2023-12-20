@@ -2,7 +2,9 @@ package com.sparta.plusweek.service;
 
 import com.sparta.plusweek.dto.PostRequestDto;
 import com.sparta.plusweek.dto.PostResponseDto;
+import com.sparta.plusweek.entity.LikePost;
 import com.sparta.plusweek.entity.Post;
+import com.sparta.plusweek.repository.LikePostRepository;
 import com.sparta.plusweek.repository.PostRepository;
 import com.sparta.plusweek.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Objects;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final LikePostRepository likePostRepository;
 
     public List<PostResponseDto> getPostList() {
         List<Post> postList = postRepository.findAllByOrderByCreatedAtDesc();
@@ -56,6 +59,28 @@ public class PostService {
     public void deletePost(Long postId, UserDetailsImpl userDetails) {
         Post post = checkPostAndUser(postId, userDetails);
         postRepository.delete(post);
+    }
+
+    public boolean toogleLike(Long postId, UserDetailsImpl userDetails) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new IllegalArgumentException("해당 게시글이 없습니다.")
+        );
+
+        if (Objects.equals(post.getUser().getUserId(), userDetails.getUser().getUserId())) {
+            throw new IllegalArgumentException("본인의 게시글에 좋아요를 할 수 없습니다.");
+        }
+
+        LikePost like = new LikePost(post, userDetails);
+        List<LikePost> likesList = likePostRepository.findAllByPost(post);
+        for (LikePost likes : likesList) {
+            if (Objects.equals(likes.getUser().getUserId(), userDetails.getUser().getUserId())) {
+                LikePost alreadyLike = likePostRepository.findByPostAndUser(like.getPost(), like.getUser());
+                likePostRepository.delete(alreadyLike);
+                return false;
+            }
+        }
+        likePostRepository.save(like);
+        return true;
     }
 
     private Post checkPostAndUser(Long postId, UserDetailsImpl userDetails) {

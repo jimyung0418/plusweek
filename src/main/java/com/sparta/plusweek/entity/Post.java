@@ -6,10 +6,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
-public class Post extends Timestamped{
+public class Post extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,14 @@ public class Post extends Timestamped{
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<LikePost> likesList = new ArrayList<>();
+
     public Post(PostRequestDto postRequestDto, UserDetailsImpl userDetails) {
+
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
         this.user = userDetails.getUser();

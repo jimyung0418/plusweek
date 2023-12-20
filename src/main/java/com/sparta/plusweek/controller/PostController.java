@@ -68,5 +68,21 @@ public class PostController {
             return ResponseEntity.badRequest().body(new CommonResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
         }
     }
+
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<CommonResponseDto> toggleLike(@PathVariable Long postId,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            boolean liked = postService.toogleLike(postId, userDetails);
+
+            if (liked) {
+                return ResponseEntity.ok().body(new CommonResponseDto("좋아요!", HttpStatus.OK.value()));
+            } else {
+                return ResponseEntity.ok().body(new CommonResponseDto("좋아요 취소!", HttpStatus.OK.value()));
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new CommonResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+    }
 }
 
