@@ -1,5 +1,6 @@
 package com.sparta.plusweek.entity;
 
+import com.sparta.plusweek.dto.CommentResponseDto;
 import com.sparta.plusweek.dto.PostRequestDto;
 import com.sparta.plusweek.security.UserDetailsImpl;
 import jakarta.persistence.*;
